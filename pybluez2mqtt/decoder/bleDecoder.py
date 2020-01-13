@@ -1,7 +1,6 @@
 import math
 from binascii import hexlify
 import struct
-from privateconfig import CONFIG as CONFIG
 #inspired from https://github.com/Scrin/RuuviCollector
 def dewPoint(temperature, relativeHumidity):
     v = math.log(relativeHumidity / 100 * equilibriumVaporPressure(temperature) / 611.2)
