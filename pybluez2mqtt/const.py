@@ -50,8 +50,8 @@ SERVICE_DATA_TYPE = 0x16
 
 # for ruuvi
 RUUVI_COMPANY_ID = b"\x99\x04"
-RUUVI_F3_FRAME = 0x03
-RUUVI_F5_FRAME = 0x05
+RUUVI_RAW_V1 = 0x03
+RUUVI_RAW_V2 = 0x05
 
 # for eddystone
 EDDYSTONE_UUID = b"\xaa\xfe"

@@ -1,7 +1,6 @@
 """Classes responsible for Beacon scanning."""
 import threading
 import struct
-import logging
 from importlib import import_module
 from binascii import hexlify
 from beacon-decoder.decoder import decode
@@ -12,13 +11,6 @@ from .const import (ScanType, ScanFilter, BluetoothAddressType,
                     LE_META_EVENT, OGF_LE_CTL, OCF_LE_SET_SCAN_ENABLE,
                     OCF_LE_SET_SCAN_PARAMETERS, EVT_LE_ADVERTISING_REPORT,
                     MS_FRACTION_DIVIDER,)
-
-
-_LOGGER = logging.getLogger(__name__)
-_LOGGER.setLevel(logging.DEBUG)
-
-# pylint: disable=no-member,too-many-arguments
-
 
 class BeaconScanner(object):
     """Scan for Beacon advertisements."""

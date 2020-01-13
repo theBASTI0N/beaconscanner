@@ -59,17 +59,6 @@ class EddystoneFilter(DeviceFilter):
         if instance is not None:
             self.properties['instance'] = instance
 
-class RuuviFilter(DeviceFilter):
-    """Filter for RUUVItag beacons."""
-
-    def __init__(self, format=None):
-        """Initialize filter."""
-        super(RuuviFilter, self).__init__()
-        if format is None:
-            raise ValueError("RuuviFilter needs at least one argument set")
-        if format is not None:
-            self.properties['format'] = format
-
 class EstimoteFilter(DeviceFilter):
     """Filter for Estimote beacons."""
 
