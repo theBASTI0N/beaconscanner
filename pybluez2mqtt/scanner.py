@@ -3,7 +3,7 @@ import threading
 import struct
 from importlib import import_module
 from binascii import hexlify
-from beacon-decoder.decoder import decode
+from beacondecoder import decode
 
 from .device_filters import BtAddrFilter, DeviceFilter
 from .utils import is_packet_type, to_int, bin_to_int, get_mode
