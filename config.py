@@ -1,6 +1,9 @@
 CONFIG = {
   "host" : "0.0.0.0",
   "ssl" : False,
+  "ca" : '/cert/ca.pem', #if not using set to None
+  "cert": '/cert/cert.pem', #if not using set to None
+  "key": '/cert/cert.key', #if not using set to None
   "port" : 1883,
   "usr" : True,
   "user" : "",

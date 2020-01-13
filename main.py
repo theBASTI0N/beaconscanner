@@ -35,9 +35,10 @@ print("Main Topic: " + TOPIC)
 DISCONNECTED = 0
 CONNECTING = 1
 CONNECTED = 2
-ROOT_CA = '/cert/ca.pem'
-CLIENT_CERT = '/cert/cert.pem'
-PRIVATE_KEY = '/cert/cert.key'
+if CONFIG.get('ssl'):
+    ROOT_CA = CONFIG.get('ca')
+    CLIENT_CERT = CONFIG.get('cert')
+    PRIVATE_KEY = CONFIG.get('key')
 
 def on_message(mosq, obj, msg):
     # This callback will be called for messages that we receive that do not

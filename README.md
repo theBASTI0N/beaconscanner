@@ -13,4 +13,6 @@ subscribing and using the data.
 sudo apt-get install python3-bluez libbluetooth-dev libcap2-bin
 # grant the python executable permission to access raw socket data
 sudo setcap 'cap_net_raw,cap_net_admin+eip' $(readlink -f $(which python))
+#installl python modules
+pip3 install uptime paho.mqtt 
 ```
