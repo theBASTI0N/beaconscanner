@@ -1,5 +1,5 @@
 import time
-from scanner import BeaconScanner
+from pybluez2mqtt import BeaconScanner
 import sys
 import time
 from uptime import uptime

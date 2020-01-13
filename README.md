@@ -7,12 +7,13 @@ subscribing and using the data.
 
 # Installation
 
+The below example if for a system based on Debian 10which includes devices such as Raspberry Pi's.
 
 ```bash
 # install libbluetooth headers and libpcap2
-sudo apt-get install python3-bluez libbluetooth-dev libcap2-bin
+sudo apt-get install python3-pip python3-bluez libbluetooth-dev git
 # grant the python executable permission to access raw socket data
-sudo setcap 'cap_net_raw,cap_net_admin+eip' $(readlink -f $(which python))
+sudo setcap 'cap_net_raw,cap_net_admin+eip' $(readlink -f $(which python3))
 #installl python modules
 pip3 install uptime paho.mqtt 
 ```

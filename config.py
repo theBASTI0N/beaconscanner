@@ -17,5 +17,5 @@ CONFIG = {
   "tlm" : True,
   "ruuvi" : True,
   "unknown" : False,
-  "interface": 'eth0'
+  "interface": 'eth0' # RPI Ethernet = eth0   RPI Zero W = wlan0
 }
