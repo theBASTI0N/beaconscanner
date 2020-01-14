@@ -1,6 +1,6 @@
 import time
 import sys
-from pybluez2mqtt import BeaconScanner
+from beaconscanner import BeaconScanner
 
 def callback(bt_addr, rssi, packet, dec):
     print((bt_addr, rssi, packet, dec))

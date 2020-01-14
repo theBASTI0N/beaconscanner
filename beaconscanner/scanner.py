@@ -5,12 +5,12 @@ from importlib import import_module
 from binascii import hexlify
 from beacondecoder import decode
 
-from .device_filters import BtAddrFilter, DeviceFilter
+from .device_filters import DeviceFilter
 from .utils import is_packet_type, to_int, bin_to_int, get_mode
 from .const import (ScanType, ScanFilter, BluetoothAddressType,
                     LE_META_EVENT, OGF_LE_CTL, OCF_LE_SET_SCAN_ENABLE,
                     OCF_LE_SET_SCAN_PARAMETERS, EVT_LE_ADVERTISING_REPORT,
-                    MS_FRACTION_DIVIDER,)
+                    MS_FRACTION_DIVIDER)
 
 class BeaconScanner(object):
     """Scan for Beacon advertisements."""

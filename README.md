@@ -1,4 +1,4 @@
-# pybluez2mqtt
+# beaconscanner
 BLE Scanner for Linux
 
 This application is designed to turn your PC running Linux into a functioning BLE
@@ -15,5 +15,5 @@ sudo apt-get install python3-pip python3-bluez libbluetooth-dev git
 # grant the python executable permission to access raw socket data
 sudo setcap 'cap_net_raw,cap_net_admin+eip' $(readlink -f $(which python3))
 #installl python modules
-pip3 install uptime paho.mqtt 
+pip3 install beaconscanner
 ```
