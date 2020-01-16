@@ -38,7 +38,7 @@ def bt_addr_to_string(addr):
     addr_str.reverse()
     hex_str = hexlify(addr_str.tostring()).decode('ascii')
     # insert ":" seperator between the bytes
-    return ':'.join(a+b for a, b in zip(hex_str[::2], hex_str[1::2]))
+    return hex_str
 
 
 def is_one_of(obj, types):
