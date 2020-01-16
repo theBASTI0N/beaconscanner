@@ -157,8 +157,8 @@ class Monitor(threading.Thread):
             (pkt[19:23] == b"\x4c\x00\x02\x15") or \
             (pkt[19:21] == b"\x99\x04") or \
             (pkt[19:21] == b"\xaa\xfe")):
-            bt_addr = bt_addr_to_string(pkt[7:13])
-            bt_addr = bt_addr.upper()
+            bt_addr = pkt[7:13]
+            bt_addr =hexlify(bt_addr).decode().upper().reverse()
             rssi = bin_to_int(pkt[-1])
             # strip bluetooth address and parse packet
             packet = pkt[14:-1]
