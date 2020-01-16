@@ -4,9 +4,8 @@ import struct
 from importlib import import_module
 from binascii import hexlify
 from beacondecoder import decode
-
 from .device_filters import DeviceFilter
-from .utils import is_packet_type, to_int, bin_to_int, get_mode
+from .utils import is_packet_type, to_int, bin_to_int, get_mode, bt_addr_to_string
 from .const import (ScanType, ScanFilter, BluetoothAddressType,
                     LE_META_EVENT, OGF_LE_CTL, OCF_LE_SET_SCAN_ENABLE,
                     OCF_LE_SET_SCAN_PARAMETERS, EVT_LE_ADVERTISING_REPORT,
@@ -158,8 +157,8 @@ class Monitor(threading.Thread):
             (pkt[19:23] == b"\x4c\x00\x02\x15") or \
             (pkt[19:21] == b"\x99\x04") or \
             (pkt[19:21] == b"\xaa\xfe")):
-            bt_addr = pkt[7:13]
-            bt_addr =hexlify(bt_addr).decode().upper()
+            bt_addr = bt_addr_to_string(pkt[7:13])
+            bt_addr = bt_addr.upper()
             rssi = bin_to_int(pkt[-1])
             # strip bluetooth address and parse packet
             packet = pkt[14:-1]
