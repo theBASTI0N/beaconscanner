@@ -71,8 +71,12 @@ class Monitor(threading.Thread):
         self.packet_filter = packet_filter
         # bluetooth socket
         self.socket = None
-        # keep track of Eddystone Beacon <-> bt addr mapping
-        self.eddystone_mappings = []
+        # keep track of RSSI values
+        self.rssiHistory = {}
+        # RSSI history tracker
+        self.seen = {}
+        # once seen more then 10 times
+        self.sten = {}
 
     def run(self):
         """Continously scan for BLE advertisements."""
@@ -164,8 +168,30 @@ class Monitor(threading.Thread):
             packet = pkt[14:-1]
             packet = hexlify(packet).decode().upper()
             dec = decode(packet)
-            self.callback(bt_addr, rssi, packet, dec)
+            smoothRSSI = self.rHistory(bt_addr, rssi)
+            self.callback(bt_addr, rssi, packet, dec, smoothRSSI)
             return
+
+    def rHistory(self, mac, rssi):
+        if self.rssiHistory.get(mac) == None:
+            self.seen[mac] = 0
+            self.sten[mac] = 0
+            self.rssiHistory[mac] = [0] * 10
+            self.rssiHistory[mac][0] = rssi
+        else:
+            cnt = self.seen[mac] + 1
+            if cnt == 10:
+                cnt = 0
+                self.sten[mac] = 1
+            self.rssiHistory[mac][cnt] = rssi
+            self.seen[mac] = cnt
+        if self.sten[mac] == 0:
+            r = rssi
+        elif self.sten[mac] == 1:
+            r = sum(self.rssiHistory[mac])/10
+        else:
+            r = sum(self.rssiHistory[mac])/cnt
+        return r
 
 
     def terminate(self):
