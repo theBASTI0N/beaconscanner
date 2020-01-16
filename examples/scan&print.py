@@ -2,8 +2,8 @@ import time
 import sys
 from beaconscanner import BeaconScanner
 
-def callback(bt_addr, rssi, packet, dec):
-    print((bt_addr, rssi, packet, dec))
+def callback(bt_addr, rssi, packet, dec, smoothedRSSI):
+    print((bt_addr, rssi, smoothedRSSI, packet, dec))
 
 def main_loop():
     # scan for all Estimote telemetry packets from a specific beacon
