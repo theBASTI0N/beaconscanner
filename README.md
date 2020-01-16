@@ -21,3 +21,7 @@ sudo setcap 'cap_net_raw,cap_net_admin+eip' $(readlink -f $(which python3))
 #installl python modules
 pip3 install beaconscanner
 ```
+
+# Based On
+
+This code is based on https://github.com/citruz/beacontools
