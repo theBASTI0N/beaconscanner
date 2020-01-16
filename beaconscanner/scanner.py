@@ -179,18 +179,20 @@ class Monitor(threading.Thread):
             self.rssiHistory[mac] = [0] * 10
             self.rssiHistory[mac][0] = rssi
         else:
+            if self.sten[mac] == 0:
+                self.sten[mac] = 1
             cnt = self.seen[mac] + 1
             if cnt == 10:
                 cnt = 0
-                self.sten[mac] = 1
+                self.sten[mac] = 2
             self.rssiHistory[mac][cnt] = rssi
             self.seen[mac] = cnt
         if self.sten[mac] == 0:
             r = rssi
         elif self.sten[mac] == 1:
-            r = sum(self.rssiHistory[mac])/10
+            r = round(sum(self.rssiHistory[mac])/(cnt + 1))
         else:
-            r = sum(self.rssiHistory[mac])/cnt
+            r = round(sum(self.rssiHistory[mac])/10)
         return r
 
 
