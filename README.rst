@@ -1,6 +1,6 @@
 beaconscanner
 =============
-|PyPI Package| |Build Status| |Coverage Status| |Requirements Status|
+|PyPI Package|
 
 BLE Scanner for Linux
 
