@@ -1,5 +1,6 @@
 # beaconscanner
 BLE Scanner for Linux
+
 ![PyPI](https://img.shields.io/pypi/v/beaconscanner?style=flat-square)
 
 This application is designed to turn your PC running Linux into a functioning BLE
