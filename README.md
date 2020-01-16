@@ -2,8 +2,12 @@
 BLE Scanner for Linux
 
 This application is designed to turn your PC running Linux into a functioning BLE
-gateway. It creates a topic that is specific to each tag for ease of
-subscribing and using the data.
+scanner.
+
+It works with beacondecoder to deliver decoded ble data for:
+Eddystone TLM beacons
+Ruuvi RAWv1 beacons
+Ruuvi RAWv2 beacons
 
 # Installation
 
