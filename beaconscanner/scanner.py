@@ -1,6 +1,7 @@
 """Classes responsible for Beacon scanning."""
 import threading
 import struct
+from uptime import uptime
 from importlib import import_module
 from binascii import hexlify
 from beacondecoder import decode
@@ -75,6 +76,8 @@ class Monitor(threading.Thread):
         self.rssiHistory = {}
         # RSSI history tracker
         self.seen = {}
+        #Time beacon was lasst seen
+        self.lastSeen = {}
         # once seen more then 10 times
         self.sten = {}
 
@@ -173,6 +176,15 @@ class Monitor(threading.Thread):
             return
 
     def rHistory(self, mac, rssi):
+        if self.lastSeen.get(mac) == None:
+            self.lastSeen[mac] = uptime()
+        else:
+            timeSince= (uptime() - self.lastSeen[mac]) / 60
+            if timeSince >= 2:
+                del self.rssiHistory[mac]
+                self.lastSeen[mac] = uptime()
+            else:
+                self.lastSeen[mac] = uptime()
         if self.rssiHistory.get(mac) == None:
             self.seen[mac] = 0
             self.sten[mac] = 0
