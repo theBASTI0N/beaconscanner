@@ -1,6 +1,6 @@
 import time
 import sys
-from beaconscanner import BeaconScanner
+from beaconscanner import BeaconReceiver
 
 def callback(bt_addr, rssi, packet, dec, smoothedRSSI, channel):
     if channel != 0:
@@ -11,7 +11,7 @@ def callback(bt_addr, rssi, packet, dec, smoothedRSSI, channel):
 def main_loop():
     # scan for all Estimote telemetry packets from a specific beacon
     global scanner
-    scanner = BeaconScanner(callback)
+    scanner = BeaconReceiver(callback)
     scanner.start()
 
 if __name__ == "__main__":
