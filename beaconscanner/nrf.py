@@ -49,6 +49,7 @@ class Receiver(threading.Thread):
         while self.keep_going:
             pkt = self.socket.readline()
             pkt = str(pkt)
+            pkt = pkt.upper()
             pkt = pkt[2:-4]
             pkt = pkt.split(",")
             if len(pkt[3]) > 6:
@@ -62,11 +63,10 @@ class Receiver(threading.Thread):
         # check if this could be a valid packet before parsing
         # this reduces the CPU load significantly
         if  ( \
-            ('4c000215' in pkt[3]) or \
+            ('4C000215' in pkt[3]) or \
             ('9904' in pkt[3]) or \
-            ('aafe' in pkt[3])):
+            ('AAFE' in pkt[3])):
             bt_addr = pkt[2]
-            bt_addr = bt_addr.upper()
             rssi = int(pkt[0])
             channel = int(pkt[1])
             # strip bluetooth address and parse packet
