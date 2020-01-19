@@ -2,15 +2,15 @@ from distutils.core import setup
 setup(
   name = 'beaconscanner',
   packages = ['beaconscanner'],
-  version = '1.1.0',  
+  version = '1.1.1',  
   license='MIT',
   description = 'Scan and decode ble data',
   author = 'theBASTI0N',
   author_email = 'theBASTI0Ncode@gmail.com',
   url = 'https://github.com/theBASTI0N/beaconscanner',
-  download_url = 'https://github.com/theBASTI0N/beaconscanner/archive/1.1.0.tar.gz',
+  download_url = 'https://github.com/theBASTI0N/beaconscanner/archive/1.1.1.tar.gz',
   keywords = ['BLE', 'decode', 'iot'],
-  install_requires=['beacondecoder', 'uptime'],
+  install_requires=['beacondecoder', 'uptime', 'pyserial'],
   classifiers=[
     'Development Status :: 4 - Beta',
     'Intended Audience :: Developers',
