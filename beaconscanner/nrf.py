@@ -14,11 +14,11 @@ class BeaconReceiver(object):
     
     def start(self):
         """Start beacon receiving."""
-        self._mon.start()
+        self._rec.start()
 
     def stop(self):
         """Stop beacon receiving."""
-        self._mon.terminate()
+        self._rec.terminate()
 
 class Receiver(threading.Thread):
     """Continously scan for BLE advertisements."""
@@ -28,6 +28,8 @@ class Receiver(threading.Thread):
         threading.Thread.__init__(self)
         self.keep_going = True
         self.callback = callback
+        self.baudrate = baudrate
+        self.timeoutValue = timeoutValue
         # Bt device, serial port
         self.bt_device_id = bt_device_id
         # keep track of RSSI values
@@ -41,13 +43,14 @@ class Receiver(threading.Thread):
 
     def run(self):
         """Continously receive BLE advertisements."""
-        self.socket = self.serial.Serial(bt_device_id, baudrate, timeout=timeoutValue)
+        
+        self.socket = serial.Serial(self.bt_device_id, self.baudrate, timeout=self.timeoutValue)
 
         while self.keep_going:
             pkt = self.socket.readline()
             pkt = str(pkt)
             pkt = pkt[2:-4]
-            pkt = pkt.splt(",")
+            pkt = pkt.split(",")
             if len(pkt[3]) > 6:
                 # BLE advertisement is more than 020106
                 self.process_packet(pkt)
@@ -65,7 +68,7 @@ class Receiver(threading.Thread):
             bt_addr = pkt[2]
             bt_addr = bt_addr.upper()
             rssi = int(pkt[0])
-            chanel = int(pkt[1])
+            channel = int(pkt[1])
             # strip bluetooth address and parse packet
             packet = pkt[2].upper()
             dec = decode(packet)
@@ -109,13 +112,3 @@ class Receiver(threading.Thread):
         """Signal runner to stop and join thread."""
         self.keep_going = False
         self.join()
-
-s = serial.Serial('/dev/ttyS0', 115200, timeout=1)
-
-while True:
-    data = str(s.readline())
-    data = data[2:-4]
-    data = data.splt(",")
-    if len(data[3]) > 6:
-        decoded = decode(data[3]
-        print(decoded)
