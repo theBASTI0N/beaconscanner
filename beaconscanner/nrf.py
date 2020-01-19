@@ -4,6 +4,7 @@ from uptime import uptime
 import serial
 from beacondecoder import decode
 from binascii import hexlify
+from const import Ibeacon_String
 
 
 
@@ -63,14 +64,14 @@ class Receiver(threading.Thread):
         # check if this could be a valid packet before parsing
         # this reduces the CPU load significantly
         if  ( \
-            ('4C000215' in pkt[3]) or \
+            (Ibeacon_String in pkt[3]) or \
             ('9904' in pkt[3]) or \
             ('AAFE' in pkt[3])):
             bt_addr = pkt[2]
             rssi = int(pkt[0])
             channel = int(pkt[1])
             # strip bluetooth address and parse packet
-            packet = pkt[2].upper()
+            packet = pkt[3]
             dec = decode(packet)
             smoothRSSI = self.rHistory(bt_addr, rssi)
             self.callback(bt_addr, rssi, packet, dec, smoothRSSI, channel)
