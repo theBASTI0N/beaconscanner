@@ -4,7 +4,7 @@ from uptime import uptime
 import serial
 from beacondecoder import decode
 from binascii import hexlify
-from const import Ibeacon_String
+from .const import Ibeacon_String
 
 
 
@@ -48,14 +48,18 @@ class Receiver(threading.Thread):
         self.socket = serial.Serial(self.bt_device_id, self.baudrate, timeout=self.timeoutValue)
 
         while self.keep_going:
-            pkt = self.socket.readline()
-            pkt = str(pkt)
-            pkt = pkt.upper()
-            pkt = pkt[2:-4]
-            pkt = pkt.split(",")
-            if len(pkt[3]) > 6:
-                # BLE advertisement is more than 020106
-                self.process_packet(pkt)
+            try:
+                pkt = self.socket.readline()
+                pkt = str(pkt)
+                pkt = pkt.upper()
+                pkt = pkt[2:-4]
+                pkt = pkt.split(",")
+                if len(pkt[3]) > 6:
+                    # BLE advertisement is more than 020106
+                    self.process_packet(pkt)
+            except:
+                #used if readline was blank
+                pass
         self.socket.close()
     
     def process_packet(self, pkt):
