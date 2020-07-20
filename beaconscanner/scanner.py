@@ -171,9 +171,8 @@ class Monitor(threading.Thread):
             packet = pkt[14:-1]
             packet = hexlify(packet).decode().upper()
             dec = decode(packet)
-            channel = 0
             smoothRSSI = self.rHistory(bt_addr, rssi)
-            self.callback(bt_addr, rssi, packet, dec, smoothRSSI, channel)
+            self.callback(bt_addr, rssi, packet, dec, smoothRSSI)
             return
 
     def rHistory(self, mac, rssi):
