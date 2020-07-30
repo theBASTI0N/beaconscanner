@@ -1,14 +1,15 @@
-from distutils.core import setup
-setup(
+import setuptools
+
+setuptools.setup(
   name = 'beaconscanner',
   packages = ['beaconscanner'],
-  version = '1.1.1',  
+  version = '1.1.2',  
   license='MIT',
   description = 'Scan and decode ble data',
   author = 'theBASTI0N',
   author_email = 'theBASTI0Ncode@gmail.com',
   url = 'https://github.com/theBASTI0N/beaconscanner',
-  download_url = 'https://github.com/theBASTI0N/beaconscanner/archive/1.1.1.tar.gz',
+  download_url = 'https://github.com/theBASTI0N/beaconscanner/archive/1.1.2.tar.gz',
   keywords = ['BLE', 'decode', 'iot'],
   install_requires=['beacondecoder', 'uptime', 'pyserial'],
   classifiers=[
