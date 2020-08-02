@@ -15,31 +15,10 @@ from .const import (ScanType, ScanFilter, BluetoothAddressType,
 class BeaconScanner(object):
     """Scan for Beacon advertisements."""
 
-    def __init__(self, callback, bt_device_id=0, device_filter=None, packet_filter=None):
+    def __init__(self, callback, bt_device_id=0, ruuvi=True, eddystone=True, ibeacon=True, unknown=True):
         """Initialize scanner."""
-        # check if device filters are valid
-        if device_filter is not None:
-            if not isinstance(device_filter, list):
-                device_filter = [device_filter]
-            if len(device_filter) > 0:
-                for filtr in device_filter:
-                    if not isinstance(filtr, DeviceFilter):
-                        raise ValueError("Device filters must be instances of DeviceFilter")
-            else:
-                device_filter = None
 
-        # check if packet filters are valid
-        if packet_filter is not None:
-            if not isinstance(packet_filter, list):
-                packet_filter = [packet_filter]
-            if len(packet_filter) > 0:
-                for filtr in packet_filter:
-                    if not is_packet_type(filtr):
-                        raise ValueError("Packet filters must be one of the packet types")
-            else:
-                packet_filter = None
-
-        self._mon = Monitor(callback, bt_device_id, device_filter, packet_filter)
+        self._mon = Monitor(callback, bt_device_id, ruuvi, eddystone, ibeacon, unknown)
 
     def start(self):
         """Start beacon scanning."""
@@ -53,7 +32,7 @@ class BeaconScanner(object):
 class Monitor(threading.Thread):
     """Continously scan for BLE advertisements."""
 
-    def __init__(self, callback, bt_device_id, device_filter, packet_filter):
+    def __init__(self, callback, bt_device_id, ruuvi, eddystone, ibeacon, unknown):
         """Construct interface object."""
         # do import here so that the package can be used in parsing-only mode (no bluez required)
         self.bluez = import_module('bluetooth._bluetooth')
@@ -66,10 +45,11 @@ class Monitor(threading.Thread):
         # number of the bt device (hciX)
         self.bt_device_id = bt_device_id
         # list of beacons to monitor
-        self.device_filter = device_filter
-        self.mode = get_mode(device_filter)
+        self.ruuvi = ruuvi
         # list of packet types to monitor
-        self.packet_filter = packet_filter
+        self.eddystone = eddystone
+        self.ibeacon = ibeacon
+        self.unknown = unknown
         # bluetooth socket
         self.socket = None
         # keep track of RSSI values
@@ -160,10 +140,9 @@ class Monitor(threading.Thread):
 
         # check if this could be a valid packet before parsing
         # this reduces the CPU load significantly
-        if  ( \
-            (pkt[19:23] == b"\x4c\x00\x02\x15") or \
-            (pkt[19:21] == b"\x99\x04") or \
-            (pkt[19:21] == b"\xaa\xfe")):
+        if  ( self.ruuvi and pkt[19:21] == b"\x99\x04") or \
+            (self.ibeacon and pkt[19:23] == b"\x4c\x00\x02\x15") or \
+            (self.eddystone and pkt[19:21] == b"\xaa\xfe"):
             bt_addr = bt_addr_to_string(pkt[7:13])
             bt_addr = bt_addr.upper()
             rssi = bin_to_int(pkt[-1])
@@ -172,6 +151,17 @@ class Monitor(threading.Thread):
             packet = hexlify(packet).decode().upper()
             dec = decode(packet)
             smoothRSSI = self.rHistory(bt_addr, rssi)
+            self.callback(bt_addr, rssi, packet, dec, smoothRSSI)
+            return
+        elif (self.unknown):
+            bt_addr = bt_addr_to_string(pkt[7:13])
+            bt_addr = bt_addr.upper()
+            rssi = bin_to_int(pkt[-1])
+            # strip bluetooth address and parse packet
+            packet = pkt[14:-1]
+            packet = hexlify(packet).decode().upper()
+            smoothRSSI = self.rHistory(bt_addr, rssi)
+            dec = {'dataFormat' : 0}
             self.callback(bt_addr, rssi, packet, dec, smoothRSSI)
             return
 
