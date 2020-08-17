@@ -9,9 +9,9 @@ from .const import Ibeacon_String
 
 
 class BeaconReceiver(object):
-    def __init__(self, callback, bt_device_id='/dev/ttyS0', baudrate=115200, timeoutValue=1):
+    def __init__(self, callback, bt_device_id='/dev/ttyS0', baudrate=115200, timeoutValue=1, ruuvi=True, ruuviPlus=False, eddystone=True, ibeacon=True, unknown=True):
         """Initialize receiver."""
-        self._rec = Receiver(callback, bt_device_id, baudrate, timeoutValue)
+        self._rec = Receiver(callback, bt_device_id, baudrate, timeoutValue, ruuvi, ruuviPlus, eddystone, ibeacon, unknown)
     
     def start(self):
         """Start beacon receiving."""
@@ -24,7 +24,7 @@ class BeaconReceiver(object):
 class Receiver(threading.Thread):
     """Continously scan for BLE advertisements."""
 
-    def __init__(self, callback, bt_device_id, baudrate, timeoutValue):
+    def __init__(self, callback, bt_device_id, baudrate, timeoutValue, ruuvi, ruuviPlus, eddystone, ibeacon, unknown):
 
         threading.Thread.__init__(self)
         self.keep_going = True
@@ -33,6 +33,12 @@ class Receiver(threading.Thread):
         self.timeoutValue = timeoutValue
         # Bt device, serial port
         self.bt_device_id = bt_device_id
+        self.ruuvi = ruuvi
+        self.ruuviPlus = ruuviPlus
+        # list of packet types to monitor
+        self.eddystone = eddystone
+        self.ibeacon = ibeacon
+        self.unknown = unknown
         # keep track of RSSI values
         self.rssiHistory = {}
         # RSSI history tracker
@@ -68,18 +74,28 @@ class Receiver(threading.Thread):
         # check if this could be a valid packet before parsing
         # this reduces the CPU load significantly
         if  ( \
-            (Ibeacon_String in pkt[1]) or \
-            ('9904' in pkt[1]) or \
-            ('AAFE' in pkt[1])):
+            (self.ibeacon and Ibeacon_String in pkt[1]) or \
+            (self.ruuvi and '9904' in pkt[1]) or \
+            (self.eddystone 'AAFE' in pkt[1])):
             bt_addr = pkt[0]
             rssi = int(pkt[2])
 
             # strip bluetooth address and parse packet
             packet = pkt[1]
-            dec = decode(packet)
+            dec = decode(packet, self.ruuviPlus)
             smoothRSSI = self.rHistory(bt_addr, rssi)
             self.callback(bt_addr, rssi, packet, dec, smoothRSSI)
             return
+        elif (self.unknown):
+            bt_addr = pkt[0]
+            rssi = int(pkt[2])
+
+            # strip bluetooth address and parse packet
+            packet = pkt[1]
+            smoothRSSI = self.rHistory(bt_addr, rssi)
+            self.callback(bt_addr, rssi, packet, dec, smoothRSSI)
+            return
+
 
     def rHistory(self, mac, rssi):
         if self.lastSeen.get(mac) == None:

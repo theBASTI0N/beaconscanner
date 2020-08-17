@@ -15,10 +15,10 @@ from .const import (ScanType, ScanFilter, BluetoothAddressType,
 class BeaconScanner(object):
     """Scan for Beacon advertisements."""
 
-    def __init__(self, callback, bt_device_id=0, ruuvi=True, eddystone=True, ibeacon=True, unknown=True):
+    def __init__(self, callback, bt_device_id=0, ruuvi=True, ruuviPlus=False, eddystone=True, ibeacon=True, unknown=True):
         """Initialize scanner."""
 
-        self._mon = Monitor(callback, bt_device_id, ruuvi, eddystone, ibeacon, unknown)
+        self._mon = Monitor(callback, bt_device_id, ruuvi, ruuviPlus, eddystone, ibeacon, unknown)
 
     def start(self):
         """Start beacon scanning."""
@@ -32,7 +32,7 @@ class BeaconScanner(object):
 class Monitor(threading.Thread):
     """Continously scan for BLE advertisements."""
 
-    def __init__(self, callback, bt_device_id, ruuvi, eddystone, ibeacon, unknown):
+    def __init__(self, callback, bt_device_id, ruuvi, ruuviPlus, eddystone, ibeacon, unknown):
         """Construct interface object."""
         # do import here so that the package can be used in parsing-only mode (no bluez required)
         self.bluez = import_module('bluetooth._bluetooth')
@@ -46,6 +46,7 @@ class Monitor(threading.Thread):
         self.bt_device_id = bt_device_id
         # list of beacons to monitor
         self.ruuvi = ruuvi
+        self.ruuviPlus = ruuviPlus
         # list of packet types to monitor
         self.eddystone = eddystone
         self.ibeacon = ibeacon
@@ -149,7 +150,7 @@ class Monitor(threading.Thread):
             # strip bluetooth address and parse packet
             packet = pkt[14:-1]
             packet = hexlify(packet).decode().upper()
-            dec = decode(packet)
+            dec = decode(packet, self.ruuviPlus)
             smoothRSSI = self.rHistory(bt_addr, rssi)
             self.callback(bt_addr, rssi, packet, dec, smoothRSSI)
             return

@@ -3,13 +3,13 @@ import setuptools
 setuptools.setup(
   name = 'beaconscanner',
   packages = ['beaconscanner'],
-  version = '1.2.0',  
+  version = '1.2.1',  
   license='MIT',
   description = 'Scan and decode ble data',
   author = 'theBASTI0N',
   author_email = 'theBASTI0Ncode@gmail.com',
   url = 'https://github.com/theBASTI0N/beaconscanner',
-  download_url = 'https://github.com/theBASTI0N/beaconscanner/archive/1.2.0.tar.gz',
+  download_url = 'https://github.com/theBASTI0N/beaconscanner/archive/1.2.1.tar.gz',
   keywords = ['BLE', 'decode', 'iot'],
   install_requires=['beacondecoder', 'uptime', 'pyserial'],
   classifiers=[
