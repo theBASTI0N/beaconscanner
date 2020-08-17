@@ -15,10 +15,10 @@ from .const import (ScanType, ScanFilter, BluetoothAddressType,
 class BeaconScanner(object):
     """Scan for Beacon advertisements."""
 
-    def __init__(self, callback, bt_device_id=0, ruuvi=True, ruuviPlus=False, eddystone=True, ibeacon=True, unknown=True):
+    def __init__(self, callback, bt_device_id=0, rssiThreshold=-999, ruuvi=True, ruuviPlus=False, eddystone=True, ibeacon=True, unknown=True):
         """Initialize scanner."""
 
-        self._mon = Monitor(callback, bt_device_id, ruuvi, ruuviPlus, eddystone, ibeacon, unknown)
+        self._mon = Monitor(callback, bt_device_id, rssiThreshold, ruuvi, ruuviPlus, eddystone, ibeacon, unknown)
 
     def start(self):
         """Start beacon scanning."""
@@ -32,7 +32,7 @@ class BeaconScanner(object):
 class Monitor(threading.Thread):
     """Continously scan for BLE advertisements."""
 
-    def __init__(self, callback, bt_device_id, ruuvi, ruuviPlus, eddystone, ibeacon, unknown):
+    def __init__(self, callback, bt_device_id, rssiThreshold, ruuvi, ruuviPlus, eddystone, ibeacon, unknown):
         """Construct interface object."""
         # do import here so that the package can be used in parsing-only mode (no bluez required)
         self.bluez = import_module('bluetooth._bluetooth')
@@ -44,6 +44,8 @@ class Monitor(threading.Thread):
 
         # number of the bt device (hciX)
         self.bt_device_id = bt_device_id
+        # RSSI Threshold, if enabled device with lower power will not be sent
+        self.rssiThreshold = rssiThreshold
         # list of beacons to monitor
         self.ruuvi = ruuvi
         self.ruuviPlus = ruuviPlus
@@ -151,8 +153,10 @@ class Monitor(threading.Thread):
             packet = pkt[14:-1]
             packet = hexlify(packet).decode().upper()
             dec = decode(packet, self.ruuviPlus)
-            smoothRSSI = self.rHistory(bt_addr, rssi)
-            self.callback(bt_addr, rssi, packet, dec, smoothRSSI)
+            if(dec['dataFormat' != 0]): #Beacon most likely ibeacon or eddstone URL/UID. FIX needed
+                smoothRSSI = self.rHistory(bt_addr, rssi)
+                if smoothRSSI >= self.rssiThreshold:
+                    self.callback(bt_addr, rssi, packet, dec, smoothRSSI)
             return
         elif (self.unknown):
             bt_addr = bt_addr_to_string(pkt[7:13])
@@ -163,7 +167,8 @@ class Monitor(threading.Thread):
             packet = hexlify(packet).decode().upper()
             smoothRSSI = self.rHistory(bt_addr, rssi)
             dec = {'dataFormat' : 0}
-            self.callback(bt_addr, rssi, packet, dec, smoothRSSI)
+            if smoothRSSI >= self.rssiThreshold:
+                    self.callback(bt_addr, rssi, packet, dec, smoothRSSI)
             return
 
     def rHistory(self, mac, rssi):
