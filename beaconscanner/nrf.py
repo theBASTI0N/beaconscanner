@@ -76,7 +76,7 @@ class Receiver(threading.Thread):
         if  ( \
             (self.ibeacon and Ibeacon_String in pkt[1]) or \
             (self.ruuvi and '9904' in pkt[1]) or \
-            (self.eddystone 'AAFE' in pkt[1])):
+            (self.eddystone and 'AAFE' in pkt[1])):
             bt_addr = pkt[0]
             rssi = int(pkt[2])
 
