@@ -9,9 +9,9 @@ from .const import Ibeacon_String
 
 
 class BeaconReceiver(object):
-    def __init__(self, callback, bt_device_id='/dev/ttyS0', baudrate=115200, timeoutValue=1, ruuvi=True, ruuviPlus=False, eddystone=True, ibeacon=True, unknown=True):
+    def __init__(self, callback, bt_device_id='/dev/ttyS0', baudrate=115200, timeoutValue=1, rssiThreshold=-999, ruuvi=True, ruuviPlus=False, eddystone=True, ibeacon=True, unknown=True):
         """Initialize receiver."""
-        self._rec = Receiver(callback, bt_device_id, baudrate, timeoutValue, ruuvi, ruuviPlus, eddystone, ibeacon, unknown)
+        self._rec = Receiver(callback, bt_device_id, baudrate, timeoutValue, rssiThreshold, ruuvi, ruuviPlus, eddystone, ibeacon, unknown)
     
     def start(self):
         """Start beacon receiving."""
@@ -24,13 +24,15 @@ class BeaconReceiver(object):
 class Receiver(threading.Thread):
     """Continously scan for BLE advertisements."""
 
-    def __init__(self, callback, bt_device_id, baudrate, timeoutValue, ruuvi, ruuviPlus, eddystone, ibeacon, unknown):
+    def __init__(self, callback, bt_device_id, baudrate, timeoutValue, rssiThreshold, ruuvi, ruuviPlus, eddystone, ibeacon, unknown):
 
         threading.Thread.__init__(self)
         self.keep_going = True
         self.callback = callback
         self.baudrate = baudrate
         self.timeoutValue = timeoutValue
+        # RSSI Threshold, if enabled device with lower power will not be sent
+        self.rssiThreshold = rssiThreshold
         # Bt device, serial port
         self.bt_device_id = bt_device_id
         self.ruuvi = ruuvi
@@ -82,10 +84,15 @@ class Receiver(threading.Thread):
 
             # strip bluetooth address and parse packet
             packet = pkt[1]
-            dec = decode(packet, self.ruuviPlus)
-            smoothRSSI = self.rHistory(bt_addr, rssi)
-            self.callback(bt_addr, rssi, packet, dec, smoothRSSI)
-            return
+            try:
+                dec = decode(packet, self.ruuviPlus)
+                if(dec['dataFormat'] != 0): #Beacon most likely ibeacon or eddstone URL/UID. FIX needed
+                    smoothRSSI = self.rHistory(bt_addr, rssi)
+                    if smoothRSSI >= self.rssiThreshold:
+                        self.callback(bt_addr, rssi, packet, dec, smoothRSSI)
+                return
+            except:
+                pass
         elif (self.unknown):
             bt_addr = pkt[0]
             rssi = int(pkt[2])
@@ -93,7 +100,8 @@ class Receiver(threading.Thread):
             # strip bluetooth address and parse packet
             packet = pkt[1]
             smoothRSSI = self.rHistory(bt_addr, rssi)
-            self.callback(bt_addr, rssi, packet, dec, smoothRSSI)
+            if smoothRSSI >= self.rssiThreshold:
+                    self.callback(bt_addr, rssi, packet, dec, smoothRSSI)
             return
 
 

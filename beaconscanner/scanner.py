@@ -152,12 +152,15 @@ class Monitor(threading.Thread):
             # strip bluetooth address and parse packet
             packet = pkt[14:-1]
             packet = hexlify(packet).decode().upper()
-            dec = decode(packet, self.ruuviPlus)
-            if(dec['dataFormat' != 0]): #Beacon most likely ibeacon or eddstone URL/UID. FIX needed
-                smoothRSSI = self.rHistory(bt_addr, rssi)
-                if smoothRSSI >= self.rssiThreshold:
-                    self.callback(bt_addr, rssi, packet, dec, smoothRSSI)
-            return
+            try:
+                dec = decode(packet, self.ruuviPlus)
+                if(dec['dataFormat'] != 0): #Beacon most likely ibeacon or eddstone URL/UID. FIX needed
+                    smoothRSSI = self.rHistory(bt_addr, rssi)
+                    if smoothRSSI >= self.rssiThreshold:
+                        self.callback(bt_addr, rssi, packet, dec, smoothRSSI)
+                return
+            except:
+                pass
         elif (self.unknown):
             bt_addr = bt_addr_to_string(pkt[7:13])
             bt_addr = bt_addr.upper()
