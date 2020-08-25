@@ -12,7 +12,7 @@ class BeaconReceiver(object):
     def __init__(self, callback, bt_device_id='/dev/ttyS0', baudrate=115200, timeoutValue=1, rssiThreshold=-999, ruuvi=True, ruuviPlus=False, eddystone=True, ibeacon=True, unknown=True):
         """Initialize receiver."""
         self._rec = Receiver(callback, bt_device_id, baudrate, timeoutValue, rssiThreshold, ruuvi, ruuviPlus, eddystone, ibeacon, unknown)
-    
+
     def start(self):
         """Start beacon receiving."""
         self._rec.start()
@@ -52,7 +52,7 @@ class Receiver(threading.Thread):
 
     def run(self):
         """Continously receive BLE advertisements."""
-        
+
         self.socket = serial.Serial(self.bt_device_id, self.baudrate, timeout=self.timeoutValue)
 
         while self.keep_going:
@@ -69,7 +69,7 @@ class Receiver(threading.Thread):
                 #used if readline was blank
                 pass
         self.socket.close()
-    
+
     def process_packet(self, pkt):
         """Parse the packet and call callback if one of the filters matches."""
 
@@ -85,11 +85,10 @@ class Receiver(threading.Thread):
             # strip bluetooth address and parse packet
             packet = pkt[1]
             try:
-                dec = decode(packet, self.ruuviPlus)
-                if(dec['dataFormat'] != 0): #Beacon most likely ibeacon or eddstone URL/UID. FIX needed
-                    smoothRSSI = self.rHistory(bt_addr, rssi)
-                    if smoothRSSI >= self.rssiThreshold:
-                        self.callback(bt_addr, rssi, packet, dec, smoothRSSI)
+                smoothRSSI = self.rHistory(bt_addr, rssi)
+                if smoothRSSI >= self.rssiThreshold:
+                    dec = decode(packet, self.ruuviPlus)
+                    self.callback(bt_addr, rssi, packet, dec, smoothRSSI)
                 return
             except:
                 pass
@@ -136,7 +135,7 @@ class Receiver(threading.Thread):
         else:
             r = round(sum(self.rssiHistory[mac])/10)
         return r
-    
+
     def terminate(self):
         """Signal runner to stop and join thread."""
         self.keep_going = False

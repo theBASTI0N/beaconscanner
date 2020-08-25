@@ -143,7 +143,7 @@ class Monitor(threading.Thread):
 
         # check if this could be a valid packet before parsing
         # this reduces the CPU load significantly
-        if  ( self.ruuvi and pkt[19:21] == b"\x99\x04") or \
+        if  (self.ruuvi and pkt[19:21] == b"\x99\x04") or \
             (self.ibeacon and pkt[19:23] == b"\x4c\x00\x02\x15") or \
             (self.eddystone and pkt[19:21] == b"\xaa\xfe"):
             bt_addr = bt_addr_to_string(pkt[7:13])
@@ -153,14 +153,13 @@ class Monitor(threading.Thread):
             packet = pkt[14:-1]
             packet = hexlify(packet).decode().upper()
             try:
-                dec = decode(packet, self.ruuviPlus)
-                if(dec['dataFormat'] != 0): #Beacon most likely ibeacon or eddstone URL/UID. FIX needed
-                    smoothRSSI = self.rHistory(bt_addr, rssi)
-                    if smoothRSSI >= self.rssiThreshold:
-                        self.callback(bt_addr, rssi, packet, dec, smoothRSSI)
+                smoothRSSI = self.rHistory(bt_addr, rssi)
+                if smoothRSSI >= self.rssiThreshold:
+                    dec = decode(packet, self.ruuviPlus)
+                    self.callback(bt_addr, rssi, packet, dec, smoothRSSI)
                 return
             except:
-                pass
+               pass
         elif (self.unknown):
             bt_addr = bt_addr_to_string(pkt[7:13])
             bt_addr = bt_addr.upper()
